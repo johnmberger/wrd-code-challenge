@@ -1,17 +1,23 @@
-(function(){
+(function() {
 
-    function onChange(event) {
-      var reader = new FileReader();
-      reader.onload = onReaderLoad;
-      reader.readAsText(event.target.files[0]);
-    }
+  $('#upload').on('change', function(e) {
 
-    function onReaderLoad(event){
-      var obj = JSON.parse(event.target.result);
-      console.log(obj);
-      $('#target').html('this works!');
-    }
+    var file = e.target.files[0];
+    var reader = new FileReader();
 
-    document.getElementById('upload').addEventListener('change', onChange);
+    reader.onload = (file => {
+      return function(e) {
 
+        let parsedJSON = JSON.parse(e.target.result);
+
+        parsedJSON.forEach(item => {
+          $('#target').append(`<${item.tag}>${item.content}</${item.tag}>`);
+        });
+
+      };
+    })(file);
+
+    reader.readAsText(file);
+
+  });
 }());
