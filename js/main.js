@@ -11,31 +11,26 @@
 
         let parsedJSON = JSON.parse(e.target.result);
 
-        parsedJSON.forEach((parent, i) => {
+        parsedJSON.forEach(parentElement => {
+          let element = $(`<${parentElement.tag}></${parentElement.tag}>`);
+          $('#target').append(element);
+          convertToHTML(parentElement.content, element);
+        });
 
-          $('#target').append(`<${parent.tag}></${parent.tag}>`);
+        function convertToHTML(ParentContent, parentElement) {
 
-          let childContent = parent.content.content;
-          let childTag = parent.content.tag;
+          if (Array.isArray(ParentContent)) {
+            ParentContent.forEach(childContent => convertToHTML(childContent, parentElement));
 
-          // *** weird js typecheck *** //
-          // actually checking for array of objects //
-          if (typeof childContent === 'object') {
-
-            childContent.forEach(child => {
-
-              $(`${parent.tag}:nth-child(${i+1})`)
-              .append(`<${child.tag}>${child.content}</${child.tag}>`);
-
-            });
+          } else if (Object(ParentContent) === ParentContent) {
+            let newParent = $(`<${ParentContent.tag}></${ParentContent.tag}`);
+            parentElement.append(newParent);
+            convertToHTML(ParentContent.content, newParent);
 
           } else {
-
-            $(`${parent.tag}`)
-            .append(`<${childTag}>${childContent}</${childTag}>`);
-
+            $(parentElement).html(ParentContent);
           }
-        });
+        }
       };
     })(file);
 
